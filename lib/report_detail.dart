@@ -100,6 +100,7 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
   double lat = 24.0695114;
   double lng = 120.8077739;
   double zoom = 7.5;
+  double maxZoom = 14.0;
   String _string = '';
   GeoJsonParser geoJson = GeoJsonParser();
   var reposition = const Icon(Icons.gps_fixed);
@@ -203,6 +204,7 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
           initialCenter: LatLng(lat, lng),
           initialZoom: zoom,
           minZoom: zoom,
+          maxZoom: maxZoom,
           backgroundColor: Colors.black87,
         ),
         children: [
