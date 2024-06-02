@@ -42,8 +42,13 @@ class _SettingMatrixState extends State<SettingMatrix> {
     prefs.setBool("siteEffect", siteEffect);
   }
 
+  final TextStyle title = const TextStyle(
+    fontSize: 30,
+    fontWeight: FontWeight.bold,
+  );
+
   final TextStyle textStyle = const TextStyle(
-    fontSize: 15,
+    fontSize: 20,
   );
   final TextStyle smallText = const TextStyle(
     fontSize: 12,
@@ -71,84 +76,70 @@ class _SettingMatrixState extends State<SettingMatrix> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListView(
         children: [
-          const Text(
-            "預警設定",
-            style: TextStyle(
-              fontSize: 30,
+          ListTile(
+            title: Text(
+              "預警設定",
+              style: title,
             ),
           ),
-          Expanded(
-            child: GridView.count(
-              crossAxisCount: 2,
-              childAspectRatio: 2,
-              children: [
-                SizedBox(
-                  height: 100,
-                  child: Card(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "接收CWA預警",
-                          style: textStyle,
-                        ),
-                        Switch(
-                          thumbIcon: thumbIcon,
-                          value: cwa,
-                          onChanged: (bool value) {
-                            setState(() {
-                              cwa = value;
-                              if (!cwa) {
-                                tpsem = false;
-                                _saveConfig();
-                              }
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 100,
-                  child: Card(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "接收TPSEM注意",
-                              style: textStyle,
-                            ),
-                            Text(
-                              "(必須先啟用CWA)",
-                              style: smallText,
-                            ),
-                          ],
-                        ),
-                        Switch(
-                          thumbIcon: thumbIcon,
-                          value: tpsem,
-                          onChanged: (bool value) {
-                            setState(() {
-                              if (cwa) {
-                                tpsem = value;
-                                _saveConfig();
-                              }
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+          SwitchListTile(
+            title: Text(
+              "中央氣象署預警",
+              style: smallText,
             ),
+            value: cwa,
+            onChanged: (bool value) {
+              setState(() {
+                cwa = value;
+                if (!cwa) {
+                  tpsem = false;
+                }
+                _saveConfig();
+              });
+            },
+          ),
+          SwitchListTile(
+            title: Text(
+              "TPSEM注意",
+              style: textStyle,
+            ),
+            subtitle: Text(
+              "(必須接收中央氣象局預警)",
+              style: smallText,
+            ),
+            value: tpsem,
+            onChanged: (bool value) {
+              setState(() {
+                if (value) {
+                  cwa = value;
+                }
+                tpsem = value;
+                _saveConfig();
+              });
+            },
+          ),
+          ListTile(
+            title: Text(
+              "計算設定",
+              style: title,
+            ),
+          ),
+          SwitchListTile(
+            title: Text(
+              "計算場址效應",
+              style: textStyle,
+            ),
+            value: siteEffect,
+            onChanged: (bool value) {
+              setState(() {
+                siteEffect = value;
+                _saveConfig();
+              });
+            },
           ),
         ],
       ),
