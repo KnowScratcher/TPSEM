@@ -1,16 +1,8 @@
-# tpsem
+# TPSEM
 
-Taiwan P and S wave Monitor
+## 目前專案正在開發中
 
-## Getting Started
+## 給開發者
+此程式由flutter編寫，語言為Dart，程式位於lib資料夾內。
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+若想參與開發，建議先[聯絡Know Scratcher](mailto:yianlee2008@gmail.com)。
