@@ -89,7 +89,7 @@ class _SettingMatrixState extends State<SettingMatrix> {
           SwitchListTile(
             title: Text(
               "中央氣象署預警",
-              style: smallText,
+              style: textStyle,
             ),
             value: cwa,
             onChanged: (bool value) {
