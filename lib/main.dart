@@ -1,16 +1,16 @@
-import 'package:provider/provider.dart';
+import 'dart:io' as io show Platform;
 
-import 'report.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:tpsem/waves.dart';
+import 'package:window_size/window_size.dart';
+
 // report_detail is imported in report.dart
 import 'monitor.dart';
 import 'mqtt.dart';
+import 'report.dart';
 import 'setting.dart';
-
-import 'package:flutter/material.dart';
-import 'package:window_size/window_size.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'dart:io' as io show Platform;
-
 
 class SoundControl {
   final player = AudioPlayer();
@@ -18,7 +18,6 @@ class SoundControl {
   void playEEW() async {
     await player.play(AssetSource("EEW.mp3"));
   }
-
 }
 
 void main() {
@@ -37,13 +36,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => MQTT(),
-      child: MaterialApp(
-        title: 'TPSEM',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
+      child: ChangeNotifierProvider(
+        create: (context) => Waves(),
+        child: MaterialApp(
+          title: 'TPSEM',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            useMaterial3: true,
+          ),
+          home: const MyHomePage(title: 'TPSEM'),
         ),
-        home: const MyHomePage(title: 'TPSEM'),
       ),
     );
   }
@@ -85,11 +87,12 @@ class _MyHomePageState extends State<MyHomePage> {
         throw UnimplementedError("沒找到");
     }
     return LayoutBuilder(builder: (context, constraints) {
-      return Scaffold(
-        body: Row(
-          children: [
-            SafeArea(
-              child: NavigationRail(
+      // print(constraints.maxWidth);
+      if (constraints.maxWidth >= 400) {
+        return Scaffold(
+          body: Row(
+            children: [
+              NavigationRail(
                 extended: constraints.maxWidth >= 600,
                 destinations: const [
                   NavigationRailDestination(
@@ -115,16 +118,62 @@ class _MyHomePageState extends State<MyHomePage> {
                   });
                 },
               ),
-            ),
-            Expanded(
-              child: Container(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                child: page,
+              Expanded(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200), // Adjust duration
+                  transitionBuilder: (Widget child, Animation<double> animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    );
+                  },
+                  child: page, // Build content based on selectedIndex
+                ),
+              )
+            ],
+          ),
+        );
+      } else {
+        return Scaffold(
+          body: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  child: page,
+                ),
               ),
-            )
-          ],
-        ),
-      );
+              SafeArea(
+                child: BottomNavigationBar(
+                  items: const [
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.home),
+                      label: '首頁',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.list),
+                      label: '地震報告',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.settings),
+                      label: "設定",
+                    ),
+                  ],
+                  currentIndex: selectedIndex,
+                  onTap: (value) {
+                    setState(() {
+                      if (selectedIndex == 0) {
+                        timer.cancel();
+                      }
+                      selectedIndex = value;
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      }
     });
   }
 }

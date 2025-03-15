@@ -194,8 +194,12 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
                 backgroundImage: AssetImage("assets/$maxIntensity.png"),
               ),
               const Padding(padding: EdgeInsets.all(5)),
-              Text(
-                  "$time ${(widget.report["EarthquakeInfo"]["Epicenter"]["Location"].split("(位於")[1].split(")")[0])}"),
+              Expanded(
+                child: Text(
+                    "$time ${(widget.report["EarthquakeInfo"]["Epicenter"]["Location"].split("(位於")[1].split(")")[0])}",
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           )),
       body: FlutterMap(

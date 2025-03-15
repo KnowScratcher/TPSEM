@@ -1,14 +1,20 @@
-import 'report_detail.dart';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
+
+import 'report_detail.dart';
+import 'response.dart';
 
 Report reports = Report(earthquakes: jsonDecode("{}"));
 
 Future<Report> fetchReports() async {
   final response = await http.get(Uri.parse(
       "https://opendata.cwa.gov.tw/api/v1/rest/datastore/E-A0015-001?Authorization=CWA-FF78208A-EA07-4AB8-B696-2EA738026DD1&limit=50&format=JSON"));
+  // TODO: debuging
+  // final response = Response();
+  // await Future.delayed(const Duration(seconds: 2));
+  // TODO: end debug
   if (response.statusCode == 200) {
     return Report.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
   } else {
@@ -98,7 +104,6 @@ String getMaxIntensity(dynamic report) {
   }
 }
 
-
 class Report {
   final List<dynamic> earthquakes;
 
@@ -149,16 +154,40 @@ class _ReportPageState extends State<ReportPage> {
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    ReportDetailPage(report: i)));
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    ReportDetailPage(report: i),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              return ScaleTransition(
+                                scale:
+                                    Tween<double>(begin: 0.2, end: 1.0).animate(
+                                  CurvedAnimation(
+                                    parent: animation,
+                                    curve: Curves.fastOutSlowIn,
+                                  ),
+                                ),
+                                child: FadeTransition(
+                                  opacity: Tween<double>(begin: 0.0, end: 1.0)
+                                      .animate(
+                                    CurvedAnimation(
+                                        parent: animation,
+                                        curve: Curves.fastOutSlowIn),
+                                  ),
+                                  child: child,
+                                ),
+                              );
+                            },
+                          ),
+                        );
                       },
                       child: Card(
                         child: ListTile(
                           leading: CircleAvatar(
                             backgroundImage:
-                            AssetImage("assets/$maxIntensity.png"),
+                                AssetImage("assets/$maxIntensity.png"),
                           ),
                           title: Text(
                               "${i["EarthquakeNo"]} ${i["EarthquakeInfo"]["Epicenter"]["Location"].split("(位於")[1].split(")")[0]}"),
@@ -176,7 +205,16 @@ class _ReportPageState extends State<ReportPage> {
             return const Text("發生錯誤");
           }
 
-          return const LinearProgressIndicator();
+          return Scaffold(
+              appBar: AppBar(
+                title: const Text("地震報告"),
+              ),
+              backgroundColor: Colors.purple[100]!,
+              body: SizedBox(
+                height: 5.0,
+                child: LinearProgressIndicator(
+                ),
+              ));
         });
   }
 }

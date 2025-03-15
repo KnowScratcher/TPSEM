@@ -56,13 +56,13 @@ class MQTT extends ChangeNotifier {
 
     //subscribe
     const qos = MqttQos.exactlyOnce;
-    const String _topic = "tpsem/+";
-    client.subscribe(_topic, qos);
+    const String subscribeTopic = "tpsem/+";
+    client.subscribe(subscribeTopic, qos);
 
     client.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
       final recMess = c![0].payload as MqttPublishMessage;
-      final pt =
-      MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+      // final pt = MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+      final pt = utf8.decode(recMess.payload.message);
 
       /// The above may seem a little convoluted for users only interested in the
       /// payload, some users however may be interested in the received publish message,
@@ -74,16 +74,17 @@ class MQTT extends ChangeNotifier {
       contentJSON = jsonDecode(pt);
       author = contentJSON["author"];
       type = contentJSON["type"];
-
       if (topic == "tpsem/tpsem" || topic == "tpsem/cwa") {
         emergency = true;
       }else{
         emergency = false;
       }
+
       // for eew access
       if (type == "eew") {
         location = LatLng(contentJSON["eew"]["lat"], contentJSON["eew"]["lng"]);
         locationName = contentJSON["eew"]["name"];
+
         depth = contentJSON["eew"]["depth"];
         time = contentJSON["eew"]["time"];
         magnitude = contentJSON["eew"]["magnitude"];
@@ -108,8 +109,6 @@ class MQTT extends ChangeNotifier {
         }
       }
       */
-
-
       notifyListeners();
     });
   }
